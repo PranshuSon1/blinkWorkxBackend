@@ -4,9 +4,12 @@ const { Sequelize, DataTypes } = require('sequelize');
 const dotenv = require("dotenv").config();
 // Initialize Express app
 const app = express();
-const PORT = 3000;
+const cors = require('cors');
+const PORT = 4005;
 app.use(express.json());
+app.use(cors());
 const db = {};
+
 
 // Database connection using Sequelize
 const sequelize = new Sequelize(process.env.DATABASE_NAME,process.env.DATABASE_USER,process.env.DATABASE_PASSWORD,{
@@ -121,12 +124,12 @@ sequelize.sync({force:false})
 app.get('/api/orders', async (req, res) => {
   try {
       const orders = await Order.findAll({
-          include: [
-              {
-                  model: OrderProductMap,
-                  include: [Product]
-              }
-          ]
+        //   include: [
+        //       {
+        //           model: OrderProductMap,
+        //           include: [Product]
+        //       }
+        //   ]
       });
       res.json(orders);
   } catch (error) {
@@ -204,7 +207,15 @@ app.delete('/api/orders/:id', async (req, res) => {
       res.status(500).json({ error: 'Failed to delete order' });
   }
 });
-
+//GET all products
+app.get('/api/products', async (req,res)=>{
+    try {
+        const product = await Product.findAll({});
+        res.json(product);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch products' });
+    }
+})
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
